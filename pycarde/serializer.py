@@ -1,6 +1,7 @@
 import os, shutil
 from PIL import Image
 import json
+from pycarde.constants import *
 from pycarde.card import RawAppCard, PkSTAppCard, STViewCard, PkViewCard, PkAbilityCard, PkConstructCard
 
 NTOTYPE = {x.__name__: x for x in [RawAppCard, PkSTAppCard, STViewCard, PkViewCard, PkAbilityCard, PkConstructCard]}

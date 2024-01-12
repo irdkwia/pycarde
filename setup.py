@@ -1,7 +1,10 @@
-__version__ = '0.8.6'
+__version__ = '0.8.7'
 import os
 
 from setuptools import setup, find_packages
+
+with open('README.md', encoding='utf-8') as file:
+    long_description = file.read()
 
 setup(
   name = 'pycarde', 
@@ -9,6 +12,8 @@ setup(
   version = __version__,
   license='GPL',
   description = 'Nintendo e-Reader card-e extractor/maker.',
+  long_description = long_description,
+  long_description_content_type='text/markdown',
   author = 'irdkwia idkmn', 
   author_email = 'irdkwia2000@gmail.com', 
   url = 'https://github.com/irdkwia/pycarde/',
