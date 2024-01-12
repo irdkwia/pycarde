@@ -1,0 +1,41 @@
+{
+	"type": "PkViewCard",
+	"data": {
+		"region": 1,
+		"codelen": 1296,
+		"pkapp": 0,
+		"special": true,
+		"cname": "Hamtaro",
+		"cid": "H-86-#",
+		"hp": 10,
+		"cat": "Hamster",
+		"pdesc": "It's Hamtaro time!",
+		"pname": "Hamtaro",
+		"ctype": 8,
+		"cdesc": "I love sunflower seeds!",
+		"dex": 86,
+		"height": "0:86?",
+		"weight": "???86",
+		"sprite": {
+			"file": "sprite.png",
+			"type": 0
+		},
+		"evotype": 12,
+		"evos": [
+			[
+				"???",
+				{
+					"file": "evos-0-1.png",
+					"type": 0
+				}
+			],
+			[
+				"???",
+				{
+					"file": "evos-1-1.png",
+					"type": 0
+				}
+			]
+		]
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"type": "RawAppCard",
+	"data": {
+		"region": 1,
+		"codelen": 2064,
+		"data": {
+			"file": "data.dat",
+			"type": 1
+		},
+		"appname": "Test Card",
+		"save": true,
+		"support": false,
+		"unk1": false,
+		"nes": false,
+		"name": "Test Card - 1",
+		"link": false
+	}
+}
