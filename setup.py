@@ -4,7 +4,7 @@ import os
 from setuptools import setup, find_packages
 
 setup(
-  name = 'dungeon-eos', 
+  name = 'pycarde', 
   packages = find_packages(),
   version = __version__,
   license='GPL',
@@ -27,4 +27,9 @@ setup(
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
   ],
+  include_package_data=True,
+  package_data={
+    "pycarde.data": ["*.dat", "*.png"],
+    "pycarde.compression.data": ["*.dat", "*.png"],
+  }
 )
