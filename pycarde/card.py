@@ -52,21 +52,25 @@ class Card:
             cards[-1].propcustomflags = cf
             apptype = cdata[0x0C]>>4
             cards[-1].propapptype = apptype
-            if cdata[0x03]==SIDE_APP and apptype not in [APPTYPE_PKMNABILITY, APPTYPE_S_PKMNABILITY, APPTYPE_PKMNBB, APPTYPE_S_PKMNBB, APPTYPE_PKMNPF, APPTYPE_S_PKMNPF, APPTYPE_PKMNMB, APPTYPE_S_PKMNMB]:
-                cardno = (cdata[0x26]>>1)&0xF
-                nbcards = ((cdata[0x27]&1)<<3)|(cdata[0x26]>>5)
-                applen = (cdata[0x28]<<7)|(cdata[0x27]>>1)
-                cards[-1].propappname = cdata[0x30:0x30+cards[-1].appnamelen()]
-                if cdata[0x2A]&0x2:
-                    cards[-1].propname = None
-                    scdata = cdata[0x30+cards[-1].appnamelen():]
+            if cdata[0x03]==SIDE_APP and apptype not in [APPTYPE_PKMNABILITY, APPTYPE_S_PKMNABILITY]:
+                if apptype in [APPTYPE_PKMNBB, APPTYPE_S_PKMNBB, APPTYPE_PKMNPF, APPTYPE_S_PKMNPF, APPTYPE_PKMNMB, APPTYPE_S_PKMNMB]:
+                    applen = ((int.from_bytes(cf[4:],'little')>>9)&0xFFFF)+0x1A0
+                    scdata = cdata[0x30:0x30+applen]
                 else:
-                    cards[-1].propname = cdata[0x30+cards[-1].appnamelen()+(cards[-1].namelen())*(cardno-1):0x30+cards[-1].appnamelen()+(cards[-1].namelen())*cardno]
-                    scdata = cdata[0x30+cards[-1].appnamelen()+(cards[-1].namelen())*nbcards:]
-                if consecutivelen>=applen:
-                    scdata = scdata = b''
-                elif consecutivelen+len(scdata)>applen:
-                    scdata = scdata[:applen-consecutivelen]
+                    cardno = (cdata[0x26]>>1)&0xF
+                    nbcards = ((cdata[0x27]&1)<<3)|(cdata[0x26]>>5)
+                    applen = (cdata[0x28]<<7)|(cdata[0x27]>>1)
+                    cards[-1].propappname = cdata[0x30:0x30+cards[-1].appnamelen()]
+                    if cdata[0x2A]&0x2:
+                        cards[-1].propname = None
+                        scdata = cdata[0x30+cards[-1].appnamelen():]
+                    else:
+                        cards[-1].propname = cdata[0x30+cards[-1].appnamelen()+(cards[-1].namelen())*(cardno-1):0x30+cards[-1].appnamelen()+(cards[-1].namelen())*cardno]
+                        scdata = cdata[0x30+cards[-1].appnamelen()+(cards[-1].namelen())*nbcards:]
+                    if consecutivelen>=applen:
+                        scdata = scdata = b''
+                    elif consecutivelen+len(scdata)>applen:
+                        scdata = scdata[:applen-consecutivelen]
             else:
                 scdata = cdata[0x30:]
             cards[-1].propdata = scdata
@@ -333,12 +337,12 @@ class PkSTAppCard(PkCard, RawCard):
         return 0x15
     
     def getname(self):
-        if self.pname:
+        if self.name:
             if self.cid:
                 av = (int.from_bytes(self.gethead(), 'big')<<4)|((self.hp//10)&0xF)
             else:
                 av = 0x80000
-            return av.to_bytes(3,'little')+padding(convertstringlocale(self.pname, self.region, MODE_SHORT), self.namelen()-4)
+            return av.to_bytes(3,'little')+padding(convertstringlocale(self.name, self.region, MODE_SHORT), self.namelen()-4)
         else:
             return None
     
@@ -351,11 +355,11 @@ class PkSTAppCard(PkCard, RawCard):
             else:
                 self.sethead((c>>4).to_bytes(2, 'big'))
                 self.hp = (c&0xF)*10
-            self.pname = convertbyteslocale(trimpadding(value[3:]), self.region, MODE_SHORT)
+            self.name = convertbyteslocale(trimpadding(value[3:]), self.region, MODE_SHORT)
         else:
             self.cid = None
             self.hp = 0
-            self.pname = ""
+            self.name = ""
     
     propname = property(getname, setname)
 
@@ -629,7 +633,7 @@ class PkConstructCard(PkCard):
     propdata = property(getdata, setdata)
 
     def getcustomflags(self):
-        c = bytearray((self.unkid<<9).to_bytes(8, 'little'))
+        c = bytearray(((self.unkid<<25)+(len(self.data)<<9)).to_bytes(8, 'little'))
         c[0] = int(self.support|((self.blocktype&0x7F)<<1))
         c[1] |= self.blocktype>>7
         return bytearray(2)+self.gethead()+c
@@ -638,7 +642,7 @@ class PkConstructCard(PkCard):
         self.sethead(value[2:4])
         self.support = bool(value[4]&1)
         self.blocktype = ((value[4]>>1))|((value[5]&1)<<7)
-        self.unkid = int.from_bytes(value[4:],'little')>>9
+        self.unkid = int.from_bytes(value[4:],'little')>>25
     
     propcustomflags = property(getcustomflags, setcustomflags)
 

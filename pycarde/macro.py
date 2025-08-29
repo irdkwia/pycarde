@@ -59,25 +59,32 @@ def getnesapp(src, dst, transform=lambda x: x, ines=True):
         file.write(data)
 
 
-def createappvpkfromdata(src, dst, lenhead=True, gba=False):
+def createappinfofromdata(src, dst, gba=False, compress=True):
     with open(dst, 'wb') as outfile:
         with open(src, 'rb') as infile:
-            c = compressVpk(infile.read())
+            if compress:
+                c = compressVpk(infile.read())
+            else:
+                c = infile.read()
             if gba:
                 c = bytes(4)+c
-            if lenhead:
-                c = len(c).to_bytes(2, 'little')+c
+            n = len(c)
+            if not compress:
+                n |= 0x8000
+            c = n.to_bytes(2, 'little')+c
             outfile.write(c)
 
-def getdatafromappvpk(src, dst, lenhead=True):
+def getdatafromappinfo(src, dst):
     with open(dst, 'wb') as outfile:
         with open(src, 'rb') as infile:
             d = infile.read()
-            if lenhead:
-                d = d[2:]
+            n = int.from_bytes(d[:2], 'little')
+            d = d[2:]
             if d[:4]==b'\x00\x00\x00\x00':
                 d = d[4:]
-            outfile.write(decompressVpk(d))
+            if not n&0x8000:
+                d = decompressVpk(d)
+            outfile.write()
 
 def getcardsinfo(clist, transform=lambda x: x, merge=False):
     srclist = []

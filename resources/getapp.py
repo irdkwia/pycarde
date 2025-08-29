@@ -14,5 +14,5 @@ getcardsinfo([
                 )
 
 
-# decompress app data (when merge=True)
-getdatafromappvpk("helloworld/card01/data.dat", "helloworld/card01/clear.bin")
+# retreive app data (when merge=True)
+getdatafromappinfo("helloworld/card01/data.dat", "helloworld/card01/clear.bin")
